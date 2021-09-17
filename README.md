@@ -8,5 +8,5 @@ I chose not to hack any physical device, but rather ‘hack’ the concept of an
 The result of this project is HeartBeats. The backend of the project runs on python and the frontend is a legacy web app (HTML/CSS/Vanilla JS). The data is stored in a SQL database that connects to the backend. 
 This project gives a pretty good idea of all the technologies and skills that we have learned during our first year at MCT.
 
-Want to know more? Make sure to click the [Wiki Page](https://github.com/VerbekeIbe/Howest-project-1/wiki).
+Want to know more? Make sure to visit the [Wiki Page](https://github.com/VerbekeIbe/Howest-project-1/wiki).
 
