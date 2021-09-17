@@ -1,5 +1,5 @@
 # Howest-project-1 - HeartBeats
-This repository contains all the code for my end of year project for the first year of Multimedia & Creative Technologies at Howest Kortrijk. (Conveniently named ‘Project 1’).
+This repository contains all the code for my end of year project for the first year of Multimedia & Creative Technologies at Howest Kortrijk. (Conveniently named ‘Project One’).
 
 We were given the assignment to ‘hack’ a device of our choice and make it useful to someone in the IoT-Field. (That someone could very well be ourselves for the purpose of fun/entertainment). We were also required to make a fitting web application to control our device and use at least one LCD screen to display the device’s IP-address. The whole project would be configured and run from a Raspberry Pi.
 
