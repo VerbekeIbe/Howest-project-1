@@ -44,7 +44,6 @@ def initial_connection():
 
 @socketio.on('F2B_switch_light')
 def switch_light(data):
-    print('licht gaat aan/uit')
     lamp_id = data['lamp_id']
     new_status = data['new_status']
     # spreek de hardware aan

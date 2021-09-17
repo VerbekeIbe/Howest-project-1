@@ -9,12 +9,9 @@ let htmlstring = "";
 
 //#region ***  Callback-Visualisation - show___ ***
 
-
 // const showBpmTime = function(currentBpmTime){
 //   console.log(`BPM time ${currentBpmTime}`)
 // };
-
-
 
 //#endregion
 
@@ -32,12 +29,9 @@ let htmlstring = "";
 
 //#region ***  INIT / DOMContentLoaded  ***
 
-
-
-const init = function() {
+const init = function () {
   console.info("DOM geladen");
   console.log("Dit is de Home pagina");
-  
 };
 
 document.addEventListener("DOMContentLoaded", init);

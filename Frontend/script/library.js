@@ -8,13 +8,13 @@ let htmlstring = "";
 //#endregion
 
 //#region ***  Callback-Visualisation - show___ ***
-const showSongs = function(jsonObject){
-  console.log(jsonObject)
-  let html_string = ""
-  for(const song of jsonObject){
-    let titel = song.Titel
-    let id = song.Id
-    let uitvoerder = song.Uitvoerder
+const showSongs = function (jsonObject) {
+  console.log(jsonObject);
+  let html_string = "";
+  for (const song of jsonObject) {
+    let titel = song.Titel;
+    let id = song.Id;
+    let uitvoerder = song.Uitvoerder;
     html_string += `<div class="o-container c-library-song">
     <div class="o-layout o-layout--gutter o-layout--align-center">
       <div class="o-layout__item u-1-of-3">
@@ -44,13 +44,12 @@ const showSongs = function(jsonObject){
         </div>
       </div>
     </div>
-  </div>`
+  </div>`;
   }
 
-  
-  document.querySelector(".js-library-song").innerHTML += html_string
+  document.querySelector(".js-library-song").innerHTML += html_string;
   listenToOptions();
-}
+};
 
 //#endregion
 
@@ -59,57 +58,52 @@ const showSongs = function(jsonObject){
 //#endregion
 
 //#region ***  Data Access - get___ ***
-const getSongs = function(){
-  console.log("songs ophalen uit de database")
-  socket.emit("F2B_get_songs")
-}
-
+const getSongs = function () {
+  console.log("songs ophalen uit de database");
+  socket.emit("F2B_get_songs");
+};
 
 //#endregion
 
 //#region ***  Event Listeners - listenTo___ ***
-const listenToSocket = function(){
+const listenToSocket = function () {
   socket.on("B2F_connected", function () {
     console.log("verbonden met socket webserver");
   });
 
-  socket.on('B2F_send_songs', function(songs){
+  socket.on("B2F_send_songs", function (songs) {
     let songlist = songs;
     showSongs(songlist);
   });
 };
 
-const listenToReset = function(){
+const listenToReset = function () {
   const resetbutton = document.querySelector(".js-reset");
-  resetbutton.addEventListener("click", function(){
-    socket.emit("F2B_reset")
-  });
-}
-
-const listenToOptions = function(){
-const deletebuttons = document.querySelectorAll(".js-delete-button")
-for(const btn of deletebuttons){
-  btn.addEventListener("click", function(){
-    console.log(btn);
-    console.log("delete geklikt");
-    const delete_id = btn.getAttribute("data-id");
-    socket.emit("F2B_delete", {song_to_delete: delete_id});
+  resetbutton.addEventListener("click", function () {
+    socket.emit("F2B_reset");
   });
 };
+
+const listenToOptions = function () {
+  const deletebuttons = document.querySelectorAll(".js-delete-button");
+  for (const btn of deletebuttons) {
+    btn.addEventListener("click", function () {
+      console.log(btn);
+      console.log("delete geklikt");
+      const delete_id = btn.getAttribute("data-id");
+      socket.emit("F2B_delete", { song_to_delete: delete_id });
+    });
+  }
 };
 //#endregion
 
 //#region ***  INIT / DOMContentLoaded  ***
 
-
-
-const init = function() {
+const init = function () {
   console.info("DOM geladen");
   console.log("Dit is de library pagina");
   getSongs();
   listenToReset();
-
-  
 };
 
 document.addEventListener("DOMContentLoaded", init);

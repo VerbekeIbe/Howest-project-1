@@ -42,21 +42,17 @@ def initial_connection():
 
 @socketio.on('F2B_get_songs')
 def get_songs():
-    print("songs uit de database halen")
     songs = DataRepository.get_all_songs()
     socketio.emit('B2F_send_songs', songs)
-    print("songs zijn verstuurd")
 
 
 @socketio.on('F2B_reset')
 def reset():
     pick_song()
-    print("Op de reset knop gedrukt op site")
 
 
 @socketio.on('F2B_pause')
 def pause():
-    print("op pauze gedrukt")
     player.pause()
 
 
@@ -67,15 +63,14 @@ def play():
 
 @socketio.on('F2B_delete')
 def delete(data):
-    print("Delete request:")
-    print(data)
     delete_id = data["song_to_delete"]
-    print(f"Delete id: {delete_id}")
+
+
+    # This command is commented out as I didn't want to constantly delete songs while testing
     # DataRepository.delete_song(delete_id)
-    print("song deleted")
 
 
-# button initialiseren
+# button init
 knop1 = Button(17)
 
 GPIO.setwarnings(False)
@@ -84,8 +79,6 @@ GPIO.setmode(GPIO.BCM)
 # song playing init
 global playing
 playing = False
-print(f"playing: {playing}")
-print("Playing init complete")
 global player
 player = vlc.MediaPlayer()
 
@@ -118,19 +111,16 @@ class MCP:
             return result
         if ch == 2:
             return result
-            print("Yeet")
 
     def close_spi(self):
         self.spi.close()
 
 
 def lees_potentio():
-    print("Reading volume")
     old_volume = 0
     while True:
         new_volume = int(MCP().read_channel(0))
         if new_volume is not old_volume:
-            # print(f"new volume: {new_volume}")
             socketio.emit(
                 'B2F_volume', {'currentVolume': f"{new_volume}"}, broadcast=True)
             time_string = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -140,21 +130,18 @@ def lees_potentio():
             deviceid_string = "Potentio"
             DataRepository.measure_device(
                 deviceid_string, new_volume, time_string)
-            # print(time_string)
             old_volume = new_volume
             global player
             global playing
-            # volumedial naar vlc
+            # volumedial to vlc
             if playing:
                 vlc.libvlc_audio_set_volume(player, new_volume)
             time.sleep(0.05)
         elif new_volume == old_volume:
-            # print("volume ongewijzigd")
             time.sleep(2)
 
 
 def lees_thermistor():
-    print("Reading Temperature")
     old_temp = 24
     while True:
         new_temp = float(MCP().read_channel(1))
@@ -163,9 +150,7 @@ def lees_thermistor():
         tcelsiusraw = tkelvin - 273.15
         global tcelsius
         tcelsius = int(tcelsiusraw)
-        print(f"temp:{tcelsius}")
         if tcelsius is not old_temp:
-            # print(f"Temperatuur gewijzigd naar : {tcelsius}")
             socketio.emit(
                 'B2F_temperature', {'currentTemperature': f"{tcelsius}"}, broadcast=True)
             time_string = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -175,16 +160,13 @@ def lees_thermistor():
             deviceid_string = "Temp"
             DataRepository.measure_device(
                 deviceid_string, tcelsius, time_string)
-            # print(time_string)
             old_temp = tcelsius
             time.sleep(3)
         elif tcelsius == old_temp:
-            # print("Temperatuur ongewijzigd")
             time.sleep(3)
 
 
 def lees_pulse():
-    print("Reading Pulse")
     # init variables
     rate = [0] * 10         # array to hold last 7 IBI values
     sampleCounter = 0       # used to determine pulse timing
@@ -282,11 +264,9 @@ def lees_pulse():
                     deviceid_string, new_BPM, time_string)
 
                 search_BPM = BPM
-                print(time_string)
                 old_BPM = new_BPM
                 # time.sleep(4)
             elif new_BPM == old_BPM:
-                # print("BPM ongewijzigd")
                 time.sleep(0.5)
 
         time.sleep(0.005)
@@ -298,11 +278,8 @@ def play_song(choice):
     if playing:
         player.stop()
         playing = False
-        print("Previous song stopped")
-    # print(f"choice of to play song: {choice}")
     title_string = choice["Titel"]
     path_string = f"/home/pi/Music/{title_string}.mp3"
-    # print(f"path string: {path_string}")
     player = vlc.MediaPlayer(f"{path_string}")
     player.play()
     playing = True
@@ -316,23 +293,19 @@ def pick_song():
         search_BPM = search_BPM * 2
     elif search_BPM > 175:
         search_BPM = int(search_BPM/2)
-    print(f"Song Picking: BPM: {search_BPM}, temperatuur: {tcelsius}")
 
     if tcelsius < 22:
         ondergrens = search_BPM + ((tcelsius - 22)*15)
         bovengrens = search_BPM
-        print(
-            f"Koud: ondergrens: {ondergrens}, bovengrens: {bovengrens}, temp: {tcelsius}")
+
     elif tcelsius > 22:
         ondergrens = search_BPM
         bovengrens = search_BPM + ((tcelsius - 22)*15)
-        print(
-            f"Warm: ondergrens: {ondergrens}, bovengrens: {bovengrens}, temp: {tcelsius}")
+
     elif tcelsius == 22:
         ondergrens = search_BPM - 15
         bovengrens = search_BPM + 15
-        print(
-            f"Mild: ondergrens: {ondergrens}, bovengrens: {bovengrens}, temp: {tcelsius}")
+
     if ondergrens < 50:
         ondergrens = 50
         bovengrens = 85
@@ -341,36 +314,27 @@ def pick_song():
         ondergrens = 140
 
     song_list = DataRepository.get_songs(ondergrens, bovengrens)
-    print("songs opgehaald")
-    # print(song_list)
+
     pick = random.randint(0, (len(song_list)-1))
     choice = song_list[pick]
-    print(f"choice: {choice}")
     play_song(choice)
 
-    # picked song naar de frontend sturen
+    # picked song to frontend
     socketio.emit('B2F_song_playing', choice)
 
-    # song entry aan database toevoegen
-    # volgnummer meetwaarde ophalen
+
     volgnummer = DataRepository.get_volgnummer()
-    print(f"volgnummer: {volgnummer}")
     meetwaarde_list = volgnummer[0]
     meetwaarde_id = meetwaarde_list["MAX(last_insert_id(Volgnummer))"]
-    print(f"meetwaarde id: {meetwaarde_id}")
 
-    # muziek id ophalen
+
     song_id = choice["Id"]
-    print(f"This is the song id: {song_id}")
-    # time string aanmaken
+    # timestamp for database
     time_string = time.strftime("%Y-%m-%d %H:%M:%S")
     DataRepository.add_song_to_playlist(meetwaarde_id, song_id, time_string)
 
-    print("Playlist Entry succesvol weggeschreven")
-
 
 def knop_pressed(pin):
-    print("Knop is ingedrukt")
     pick_song()
     time.sleep(1)
 
@@ -391,13 +355,7 @@ try:
     print(ip_message)
     # printing IP address to lcd display
     display.setup()
-    print("Display setup complete")
-    # write_message("")
-    # display.send_instruction(0b11000000)
-    # display.send_instruction(0b11000001)
-    # display.write_message(f"{ip_message}")
     display.write_message(f"{ip_message}")
-    print("Display message completed")
 
 except KeyboardInterrupt as e:
     print("quitting...")
