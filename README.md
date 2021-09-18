@@ -10,3 +10,5 @@ This project gives a pretty good idea of all the technologies and skills that we
 
 Want to know more? Make sure to visit the [Wiki Page](https://github.com/VerbekeIbe/Howest-project-1/wiki).
 
+*Raspberry Pi, MySQL, Python, Flask, Socket.io, HTML/CSS/JS*
+
